@@ -1,7 +1,6 @@
 # Sightline
 
-Smart glasses that continuously capture your day, paired with an app that
-turns that footage into a short, watchable recap.
+An app that captures your day, and at the end of the day, turns it into 60-second, watchable recap.
 
 ## Repository structure
 
@@ -15,7 +14,3 @@ Sightline/
 
 Each subteam owns and documents its own folder — see the README inside
 `ios/`, `backend/`, and `ml/`.
-
-## License
-
-[MIT](LICENSE)
