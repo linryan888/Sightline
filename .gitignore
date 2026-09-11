@@ -1,0 +1,17 @@
+# Python (backend, ml)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.pytest_cache/
+
+# Swift / Xcode
+ios/**/xcuserdata/
+ios/**/DerivedData/
+ios/**/.build/
+
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,11 @@
+# TODO: split into per-subteam workflows (ios-ci.yml, backend-ci.yml,
+# ml-ci.yml) once each subproject has real dependencies/tests to run.
+name: CI
+on:
+  pull_request:
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "TODO: add lint/test steps per subteam"
