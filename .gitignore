@@ -15,3 +15,6 @@ ios/**/.build/
 .DS_Store
 .vscode/
 .idea/
+
+# extension files
+.pvnc/
