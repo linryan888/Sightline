@@ -8,4 +8,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "TODO: add lint/test steps per subteam"
+      - run: |
+          echo "TODO: add lint/test steps per subteam"
