@@ -73,8 +73,7 @@ loopback address.
 
 ### Teammate verification
 
-Ask a teammate to start from a fresh clone on their laptop and follow the
-steps above. Have them confirm that `/docs` opens, `GET /` returns the welcome
-message, and a request can be executed using **Try it out** in the docs.
-Record their operating system and result in the pull request. This separate
-laptop check is required before marking the task complete.
+ - confirm that `/docs` opens,
+ -  `GET /` returns the welcome message
+ -  request can be executed using **Try it out** in the docs.
+Send screenshot to ruthvik102008@gmail.com or text me 2096655056.
