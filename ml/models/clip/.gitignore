@@ -1,0 +1,7 @@
+# local data + generated output (don't commit videos)
+clips/
+raw_videos/
+cluster_output/
+*.mp4
+*.mov
+labels.csv
