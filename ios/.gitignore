@@ -1,0 +1,19 @@
+# --- Xcode build output ---
+DerivedData/
+build/
+
+# --- Per-user Xcode state (window layout, breakpoints, schemes) ---
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+# --- Swift Package Manager ---
+.build/
+.swiftpm/
+
+# --- macOS ---
+.DS_Store
+
+# --- Secrets (real values; Secrets.example.xcconfig IS committed) ---
+Secrets.xcconfig
