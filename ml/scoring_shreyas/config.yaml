@@ -1,0 +1,62 @@
+# SightLine scoring pipeline (SIG-64) - Shreyas
+# Everything tunable lives here. Only the 5 numbers marked TUNED are weights;
+# the rest are fixed settings.
+
+window_seconds: 5.0          # same 5 s windows as the backend splitter
+sample_fps: 2                # frames per second decoded for YOLO tracking
+clip_frames_per_window: 2    # of those, how many go through CLIP
+frame_long_side: 640         # frames are downscaled so the long side is this
+
+weights:                     # how much each signal counts (re-normalized to sum to 1)
+  clip: 0.45                 # TUNED - does it look like a moment worth keeping?
+  people: 0.25               # TUNED - how many different people are in it
+  speech: 0.20               # TUNED - how much of it has someone talking
+  quality: 0.10              # TUNED - sharp, well-lit footage beats blur
+
+clip:
+  model: ViT-B-32
+  pretrained: laion2b_s34b_b79k
+  # Broad, people-focused prompts beat specific ones in SIG-23 testing,
+  # and a "first-person photo of" template made results worse, so none is used.
+  positive_prompts:
+    - a memorable moment with friends
+    - people having fun together
+    - people celebrating
+    - an exciting event
+    - people talking to each other
+    - a delicious meal
+  negative_prompts:
+    - an empty hallway
+    - a boring empty room
+    - a computer screen at a desk
+    - a blank wall
+    - the ground while walking
+    - a blurry dark photo
+
+people:
+  model: yolo11n.pt          # smallest YOLO11; downloads automatically
+  tracker: bytetrack.yaml    # gives each person an ID that stays the same across frames
+  conf: 0.35                 # ignore detections less confident than this
+  min_track_frames: 2        # a person must appear in >= 2 sampled frames to count
+  max_count: 4               # 4+ people all count the same (a crowd is a crowd)
+
+speech:
+  threshold: 0.5             # Silero VAD speech probability threshold
+
+events:
+  # Windows are grouped into events with HDBSCAN on [CLIP embedding, time of day].
+  # Two windows this many minutes apart are as "different" as two unrelated scenes,
+  # so your desk at 9am and your desk at 3pm become separate events.
+  time_scale_minutes: 30
+  min_event_windows: 3
+
+selection:                   # only for the preview recap.mp4
+  mmr_lambda: 0.7            # TUNED - 1.0 = pick the highest scores, 0.0 = pick the most varied
+  n_windows: 12              # 12 x 5 s = 60 s
+  n_windows_quiet_day: 6     # 30 s recap when the day has fewer than 4 events
+  max_share_per_event: 0.34  # no event gets more than about a third of the recap
+  min_gap_seconds: 10        # don't pick two windows back to back in the same video
+  min_score: 0.35            # windows below this are only used to reach the 30 s minimum
+
+evaluation:
+  moment_tolerance_seconds: 2.5   # a top-10 moment counts as found if within this of a selected window
