@@ -39,10 +39,13 @@ need to install Python, FFmpeg, or Python packages on your laptop.
    cp .env.example .env
    ```
 
-   The current starter app needs no secrets, so the copied file can stay as-is.
-   If required variables are added later, fill in their values in `.env`.
+   The starter app can run with blank values now.
+   Before using the chunk endpoints:
+       - fill in SUPABASE_URL
+       - fill in SUPABASE_KEY
+      in your local `.env` file.
    Never commit `.env`; it is already listed in `.gitignore`.
-4. Start the backend:
+5. Start the backend:
 
    ```sh
    docker compose up
@@ -51,7 +54,7 @@ need to install Python, FFmpeg, or Python packages on your laptop.
    The first run builds the image and downloads its dependencies, which can
    take several minutes and requires internet access. Wait for
    `Application startup complete` in the logs.
-5. Open [http://localhost:8000/docs](http://localhost:8000/docs) for interactive
+6. Open [http://localhost:8000/docs](http://localhost:8000/docs) for interactive
    API documentation. The root endpoint is [http://localhost:8000/](http://localhost:8000/).
 
 Stop the attached server with **Ctrl+C**. To remove the project's stopped
