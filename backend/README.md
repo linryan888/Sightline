@@ -65,7 +65,7 @@ The upload creates a file in `footage` and a metadata row in `chunks`. Repeating
 
 The updated PR #5 code was built with Docker and tested against Supabase using a one-second MP4. Automated checks confirmed successful upload, retrieval, the metadata row, and that the stored video matched the original. Manual testing through `/docs` also confirmed that the uploaded chunk appeared in retrieval results.
 
-A final fresh-clone check from `main` remains to be completed after merging.
+A final fresh-clone check from merged `main` commit `448fd9b` passed. The backend started successfully with `docker compose up --build` and became healthy. Testing through `/docs` with a small MP4 and an existing Supabase Auth user returned HTTP **201** for upload and HTTP **200** for retrieval, with the uploaded record present. The stored video and metadata were also verified in Supabase. Credentials remained in the local, gitignored `.env`; no secrets were committed.
 
 ## Stop the backend
 
