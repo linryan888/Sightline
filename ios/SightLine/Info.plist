@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>HiMelody-Regular.ttf</string>
+		<string>IrishGrover-Regular.ttf</string>
+		<string>Inika-Regular.ttf</string>
+		<string>JacquesFrancoisShadow-Regular.ttf</string>
+		<string>JejuHallasan-Regular.ttf</string>
+		<string>Gugi-Regular.ttf</string>
+		<string>JainiPurva-Regular.ttf</string>
+		<string>Griffy-Regular.ttf</string>
+		<string>GermaniaOne-Regular.ttf</string>
+	</array>
+</dict>
+</plist>
