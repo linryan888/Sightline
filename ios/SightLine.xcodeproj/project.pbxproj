@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		42536AAA3099737100601559 /* MWDATCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 42536AA93099737100601559 /* MWDATCamera */; };
+		42536AAC3099737100601559 /* MWDATCore in Frameworks */ = {isa = PBXBuildFile; productRef = 42536AAB3099737100601559 /* MWDATCore */; };
+		42536AAE3099737100601559 /* MWDATDisplay in Frameworks */ = {isa = PBXBuildFile; productRef = 42536AAD3099737100601559 /* MWDATDisplay */; };
+		42536AB03099737100601559 /* MWDATInputs in Frameworks */ = {isa = PBXBuildFile; productRef = 42536AAF3099737100601559 /* MWDATInputs */; };
+		42536AB63099737100601559 /* MWDATMotion in Frameworks */ = {isa = PBXBuildFile; productRef = 42536AB53099737100601559 /* MWDATMotion */; };
+		42536AB83099737100601559 /* MWDATSpeech in Frameworks */ = {isa = PBXBuildFile; productRef = 42536AB73099737100601559 /* MWDATSpeech */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		BC6EF5823079BF0200A1F8B3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +61,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42536AB83099737100601559 /* MWDATSpeech in Frameworks */,
+				42536AAE3099737100601559 /* MWDATDisplay in Frameworks */,
+				42536AB63099737100601559 /* MWDATMotion in Frameworks */,
+				42536AAA3099737100601559 /* MWDATCamera in Frameworks */,
+				42536AAC3099737100601559 /* MWDATCore in Frameworks */,
+				42536AB03099737100601559 /* MWDATInputs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,12 +87,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		42536AA83099736500601559 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		BC6EF5693079BF0100A1F8B3 = {
 			isa = PBXGroup;
 			children = (
 				BC6EF5743079BF0100A1F8B3 /* SightLine */,
 				BC6EF5843079BF0200A1F8B3 /* SightLineTests */,
 				BC6EF58E3079BF0200A1F8B3 /* SightLineUITests */,
+				42536AA83099736500601559 /* Frameworks */,
 				BC6EF5733079BF0100A1F8B3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +135,12 @@
 			);
 			name = SightLine;
 			packageProductDependencies = (
+				42536AA93099737100601559 /* MWDATCamera */,
+				42536AAB3099737100601559 /* MWDATCore */,
+				42536AAD3099737100601559 /* MWDATDisplay */,
+				42536AAF3099737100601559 /* MWDATInputs */,
+				42536AB53099737100601559 /* MWDATMotion */,
+				42536AB73099737100601559 /* MWDATSpeech */,
 			);
 			productName = SightLine;
 			productReference = BC6EF5723079BF0100A1F8B3 /* SightLine.app */;
@@ -399,8 +428,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z4UBG34P4G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SightLine-Info.plist";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Needed to connect to your Meta glasses.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Needed to connect to your Meta glasses.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Lets your phone connect to your glasses over Wi-Fi.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -431,8 +465,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z4UBG34P4G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "SightLine-Info.plist";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Needed to connect to your Meta glasses.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Needed to connect to your Meta glasses.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Lets your phone connect to your glasses over Wi-Fi.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -595,6 +634,39 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		42536AA93099737100601559 /* MWDATCamera */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC6EF5AC3079C0BF00A1F8B3 /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATCamera;
+		};
+		42536AAB3099737100601559 /* MWDATCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC6EF5AC3079C0BF00A1F8B3 /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATCore;
+		};
+		42536AAD3099737100601559 /* MWDATDisplay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC6EF5AC3079C0BF00A1F8B3 /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATDisplay;
+		};
+		42536AAF3099737100601559 /* MWDATInputs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC6EF5AC3079C0BF00A1F8B3 /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATInputs;
+		};
+		42536AB53099737100601559 /* MWDATMotion */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC6EF5AC3079C0BF00A1F8B3 /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATMotion;
+		};
+		42536AB73099737100601559 /* MWDATSpeech */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC6EF5AC3079C0BF00A1F8B3 /* XCRemoteSwiftPackageReference "meta-wearables-dat-ios" */;
+			productName = MWDATSpeech;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BC6EF56A3079BF0100A1F8B3 /* Project object */;
 }

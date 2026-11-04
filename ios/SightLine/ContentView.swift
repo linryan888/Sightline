@@ -10,16 +10,17 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query(sort: \Item.timestamp, order: .reverse) private var items: [Item]
+    @State private var showGlasses = false // Meta glasses screen
 
     var body: some View {
         NavigationSplitView {
             List {
                 ForEach(items) { item in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        CaptureDetailView(item: item)
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        CaptureRow(item: item)
                     }
                 }
                 .onDelete(perform: deleteItems)
@@ -37,18 +38,20 @@ struct ContentView: View {
         } detail: {
             Text("Select an item")
         }
+        .sheet(isPresented: $showGlasses) {
+            GlassesView()
+        }
     }
 
+    /// + opens the glasses screen; photos/videos taken there are saved to this list.
     private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
+        showGlasses = true
     }
 
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
+                CaptureStorage.deleteFile(for: items[index])
                 modelContext.delete(items[index])
             }
         }
