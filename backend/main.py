@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
 from supabase import create_client
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Depends
+from auth import make_current_user_dependency
 from pydantic import BaseModel
 from datetime import date
 from uuid import UUID, uuid4
@@ -19,6 +20,7 @@ supabase = create_client(
     os.environ["SUPABASE_URL"],
     os.environ["SUPABASE_KEY"]
 )
+get_current_user = make_current_user_dependency(supabase)
 
 # 2. Define a Pydantic model for data validation (for POST/PUT requests)
 class Item(BaseModel):
@@ -47,7 +49,7 @@ def create_item(item: Item):
 @app.post("/chunks/upload", status_code=201)
 def upload_chunk(
     file: UploadFile = File(...),
-    user_id: UUID = Form(...),
+    user_id: str = Depends(get_current_user),
     date: date = Form(...)
 ):
     # 1. Create a unique filename
@@ -105,8 +107,8 @@ def upload_chunk(
 # Retrieve all video chunks for a specific user and date
 @app.get("/chunks")
 def get_chunks(
-    user_id: UUID,
-    date: date
+    date: date,
+    user_id: str = Depends(get_current_user)
 ):
     try:
         # Filter chunks by both user ID and date

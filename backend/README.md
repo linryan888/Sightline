@@ -16,7 +16,6 @@ FFmpeg, and the dependencies in `requirements.txt`. The container runs Uvicorn
 as an unprivileged user on port 8000. Compose passes the root `.env` file to
 the API at runtime; secrets are excluded from the backend image.
 
-
 ## Run the backend
 
 Install and start Docker Desktop. From the repository root—the folder containing `docker-compose.yml`—copy the environment template:
@@ -74,3 +73,56 @@ Press **Ctrl+C**, then remove the stopped containers and network:
 ```sh
 docker compose down
 ```
+
+## Chunk Endpoint Authentication
+
+Both video chunk endpoints require a valid Supabase Auth access token.
+
+Include the token in the HTTP Authorization header:
+
+Authorization: Bearer <access_token>
+
+The backend validates the token with Supabase Auth and obtains the authenticated user's ID.
+
+The client no longer supplies a user_id parameter. The backend uses the authenticated user ID for both storage paths and database queries.
+
+### Upload a video chunk
+
+POST /chunks/upload
+
+Required:
+
+- Authorization: Bearer token
+- file: video file
+- date: YYYY-MM-DD
+
+Example:
+
+```bash
+curl -X POST "http://localhost:8000/chunks/upload" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@test.mp4;type=video/mp4" \
+  -F "date=2026-11-07"
+```
+
+Successful response: HTTP 201 Created.
+
+### Retrieve video chunks
+
+GET /chunks?date=YYYY-MM-DD
+
+Example:
+
+```bash
+curl "http://localhost:8000/chunks?date=2026-11-07" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Successful response: HTTP 200 OK.
+
+### Authentication errors
+
+- Missing token: HTTP 401 Unauthorized
+- Invalid or expired token: HTTP 401 Unauthorized
+
+The Supabase secret API key must remain on the backend and must never be included in iOS application code.
