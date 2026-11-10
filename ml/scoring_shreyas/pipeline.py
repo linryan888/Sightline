@@ -186,12 +186,15 @@ def speech_fraction(audio, vad, windows, threshold, sr=16000):
     return out
 
 
-def process_video(path, models, cfg, timer):
-    """All raw signals for one video. Returns one dict per window."""
+def process_video(path, models, cfg, timer, windows=None):
+    """All raw signals for one video. Returns one dict per window.
+    `windows` = list of (start, end) seconds to score; if None, cut the video into 5 s windows."""
     pc = cfg["people"]
     size, fps = cfg["window_seconds"], cfg["sample_fps"]
     duration, has_audio = probe(path)
-    windows = make_windows(duration, size)
+    windows = windows or make_windows(duration, size)
+    starts = np.array([s for s, _ in windows])
+    ends = np.array([e for _, e in windows])
     t0_clock = start_time_of(path)
 
     # --- frames: YOLO tracking on every sampled frame, keep a few per window for CLIP
@@ -203,17 +206,19 @@ def process_video(path, models, cfg, timer):
     portrait = False
     for ts, frame in read_frames(path, fps, cfg["frame_long_side"]):
         portrait = frame.shape[0] > frame.shape[1]
-        w = min(int(ts // size), len(windows) - 1)
-        win = per_window[w]
         y0 = time.perf_counter()
         res = tracker.track(frame[:, :, ::-1], persist=True, tracker=pc["tracker"], classes=[0],
                             conf=pc["conf"], verbose=False)[0]   # YOLO wants BGR; class 0 = person
         yolo_time += time.perf_counter() - y0
-        if res.boxes is not None and res.boxes.id is not None:
-            for tid in res.boxes.id.int().tolist():
+        ids = res.boxes.id.int().tolist() if res.boxes is not None and res.boxes.id is not None else []
+        sharp = sharpness(frame)
+        # give this frame to every window it falls inside (usually exactly one)
+        for w in np.nonzero((starts <= ts) & (ts < ends))[0]:
+            win = per_window[w]
+            for tid in ids:
                 win["tracks"][tid] = win["tracks"].get(tid, 0) + 1
-        win["sharp"].append(sharpness(frame))
-        win["clip_frames"].append(frame)
+            win["sharp"].append(sharp)
+            win["clip_frames"].append(frame)
     timer.add("decode_frames", t)
     timer.seconds["decode_frames"] -= yolo_time
     timer.seconds["people_yolo"] = timer.seconds.get("people_yolo", 0.0) + yolo_time
