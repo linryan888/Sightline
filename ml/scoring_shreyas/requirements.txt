@@ -1,0 +1,13 @@
+torch
+torchvision
+open_clip_torch
+ultralytics
+lap>=0.5.12        # needed by YOLO's ByteTrack tracker
+silero-vad
+imageio-ffmpeg     # bundles ffmpeg, so nothing else to install
+opencv-python
+numpy
+scipy
+scikit-learn
+pyyaml
+pillow

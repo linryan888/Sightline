@@ -1,0 +1,9 @@
+# footage, model weights and run output stay out of git
+*.mp4
+*.mov
+*.MP4
+*.MOV
+*.pt
+footage/
+out*/
+__pycache__/
