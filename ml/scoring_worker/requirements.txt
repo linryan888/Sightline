@@ -1,0 +1,3 @@
+-r ../scoring_shreyas/requirements.txt   # the SIG-64 pipeline's libraries
+supabase
+python-dotenv
