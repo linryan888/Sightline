@@ -1,0 +1,13 @@
+{
+  "device": "cpu",
+  "model": "ViT-B-32/laion2b_s34b_b79k",
+  "n_clips": 40,
+  "n_frames_per_clip": 4,
+  "embedding_dim": 512,
+  "mean_sec_per_clip": 0.3984413708560169,
+  "mean_sec_decode_per_clip": 0.19539957182714715,
+  "mean_sec_encode_per_clip": 0.2030417990288697,
+  "total_sec": 15.937654834240675,
+  "peak_rss_mb": 1418.78125,
+  "torch_threads": 6
+}
