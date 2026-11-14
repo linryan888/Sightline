@@ -1,0 +1,11 @@
+torch
+torchvision
+open_clip_torch
+opencv-python
+pillow
+numpy
+scikit-learn
+matplotlib
+umap-learn   # optional: if it won't install, the script falls back to t-SNE
+pandas       # only needed for --embeddings *.parquet
+pyarrow      # only needed for --embeddings *.parquet
