@@ -1,0 +1,7 @@
+clips/
+yolo_output/
+runs/
+*.pt
+*.mp4
+*.mov
+*.ipynb
