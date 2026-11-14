@@ -58,7 +58,7 @@ Wait for startup, then open http://127.0.0.1:8000/docs.
 6. Enter the same user ID and date, then click **Execute**.
 7. Expect HTTP **200** and confirm the uploaded chunk's `id` appears in the response.
 
-The upload creates a file in `footage` and a metadata row in `chunks`. Repeating the upload creates another record.
+The upload creates a file in `footage`, a metadata row in `chunks`, and one row in `windows` per 5 seconds of video. The chunk's `status` becomes `split`, or `split_failed` if the video could not be split (the file and chunk are kept). Repeating the upload creates another record.
 
 ## Verification
 

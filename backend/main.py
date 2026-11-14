@@ -1,8 +1,11 @@
 import os
+import shutil
+import tempfile
 from dotenv import load_dotenv
 from supabase import create_client
 from fastapi import FastAPI, status, Depends
 from auth import make_current_user_dependency
+from windows import get_duration, make_windows, save_windows
 from pydantic import BaseModel
 from datetime import date
 from uuid import UUID, uuid4
@@ -45,7 +48,48 @@ def create_item(item: Item):
 
 # --- SightLine video chunk endpoints ---
 
-# Upload a video chunk and save its metadata to Supabase
+WINDOW_SECONDS = 5
+
+def update_chunk(chunk_id, values):
+    return supabase.table("chunks").update(values).eq("id", chunk_id).execute().data
+
+# Create a chunk's window rows and return the updated chunk record.
+# Errors are logged rather than raised so a failed split never loses the upload.
+def split_chunk(chunk_id, video_file):
+    temp_path = None
+    try:
+        # ffprobe needs a real file on disk
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_path = temp_file.name
+            video_file.seek(0)
+            shutil.copyfileobj(video_file, temp_file)
+
+        duration = get_duration(temp_path)
+        windows = make_windows(duration, window_size=WINDOW_SECONDS)
+        if not windows:
+            raise ValueError(f"No windows for duration {duration}")
+
+        save_windows(chunk_id, windows, supabase)
+        return update_chunk(chunk_id, {
+            "duration_seconds": duration,
+            "status": "split"
+        })
+    except Exception as e:
+        print(f"Chunk Split Error ({chunk_id}): {type(e).__name__}: {e}")
+
+        try:
+            return update_chunk(chunk_id, {"status": "split_failed"})
+        except Exception as update_error:
+            print(
+                f"Chunk Status Error ({chunk_id}): "
+                f"{type(update_error).__name__}: {update_error}"
+            )
+            return None
+    finally:
+        if temp_path:
+            Path(temp_path).unlink(missing_ok=True)
+
+# Upload a video chunk, save its metadata to Supabase, and create its windows
 @app.post("/chunks/upload", status_code=201)
 def upload_chunk(
     file: UploadFile = File(...),
@@ -98,10 +142,13 @@ def upload_chunk(
             detail="Failed to save chunk metadata"
         )
 
-    # 5. Return the newly created database record
+    # 5. Split the video into windows and record the outcome on the chunk
+    updated_chunk = split_chunk(result.data[0]["id"], file.file)
+
+    # 6. Return the database record
     return {
         "message": "Video uploaded successfully",
-        "chunk": result.data
+        "chunk": updated_chunk or result.data
     }
 
 # Retrieve all video chunks for a specific user and date
