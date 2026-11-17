@@ -91,6 +91,12 @@ struct CaptureDetailView: View {
                 ShareLink(item: url) {
                     Label("Share or Save", systemImage: "square.and.arrow.up")
                 }
+                #if DEBUG
+                // Send a glasses recording to the backend (debug until login lands).
+                if item.captureKind == .video {
+                    UploadButton(title: "Upload to backend", fileURL: url, date: item.timestamp)
+                }
+                #endif
             } else {
                 Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
             }

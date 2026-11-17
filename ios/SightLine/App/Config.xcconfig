@@ -1,0 +1,11 @@
+// Base build settings for the SightLine app target (wired up in the Xcode
+// project as the target's "Based on Configuration File").
+//
+// Real values live in Secrets.xcconfig, which is gitignored. Copy
+// Secrets.example.xcconfig to Secrets.xcconfig and fill it in.
+//
+// "#include?" (with the ?) means the build still works when Secrets.xcconfig
+// is missing; the app then shows a "not set" error when it needs a value,
+// instead of failing to build.
+
+#include? "Secrets.xcconfig"

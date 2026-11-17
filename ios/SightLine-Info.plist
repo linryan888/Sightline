@@ -56,5 +56,26 @@
 	<array>
 		<string>_bonjour._tcp</string>
 	</array>
+	<!-- Values from Secrets.xcconfig (via App/Config.xcconfig), read by
+	     App/AppConfig.swift. Empty when Secrets.xcconfig is missing. -->
+	<key>API_BASE_URL</key>
+	<string>$(API_BASE_URL)</string>
+	<key>SUPABASE_URL</key>
+	<string>$(SUPABASE_URL)</string>
+	<key>SUPABASE_ANON_KEY</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
+	<!-- Debug upload button only (see Networking/DevAuth.swift). -->
+	<key>TEST_USER_EMAIL</key>
+	<string>$(TEST_USER_EMAIL)</string>
+	<key>TEST_USER_PASSWORD</key>
+	<string>$(TEST_USER_PASSWORD)</string>
+	<!-- LOCAL TESTING ONLY: allows plain http:// to private IPs such as your
+	     Mac running the backend in Docker. The deployed backend uses https.
+	     Remove before shipping. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

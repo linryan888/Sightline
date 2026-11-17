@@ -16,6 +16,18 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             List {
+                #if DEBUG
+                Section("Debug") {
+                    // Bundled clip from SightLine/Resources; tests the upload
+                    // without needing glasses (SIG ticket: upload a video).
+                    UploadButton(
+                        title: "Upload test clip",
+                        fileURL: Bundle.main.url(forResource: "test-clip", withExtension: "mp4"),
+                        date: Date()
+                    )
+                }
+                #endif
+
                 ForEach(items) { item in
                     NavigationLink {
                         CaptureDetailView(item: item)
