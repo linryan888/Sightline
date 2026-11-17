@@ -1,0 +1,5 @@
+ultralytics
+lap            # used by the ByteTrack / BoT-SORT trackers
+opencv-python
+numpy
+pillow

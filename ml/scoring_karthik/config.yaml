@@ -1,0 +1,43 @@
+# SightLine scoring pipeline (SIG-63) - Karthik
+# Everything you can tune lives in this file.
+# The 5 numbers marked TUNED are the only knobs; the rest are fixed settings.
+
+window_seconds: 5.0          # same 5 s windows as the backend splitter
+min_window_seconds: 1.0      # a leftover tail shorter than this is dropped
+frames_per_window: 3         # frames looked at per window (sharpness + CLIP)
+frame_long_side: 640         # frames are shrunk so the longer side is this many pixels
+
+weights:                     # how much each signal counts (re-scaled to add up to 1)
+  clip: 0.50                 # TUNED - does it look like a moment worth keeping?
+  novelty: 0.20              # TUNED - how unlike the average moment of the day is it?
+  quality: 0.30              # TUNED - sharp footage beats blurry footage
+
+time_scale_minutes: 30       # TUNED - two windows this far apart count as "different moments"
+                             #         even if they look the same (desk at 9am vs 3pm)
+
+clip:
+  model: ViT-B-32
+  pretrained: laion2b_s34b_b79k    # same weights as SIG-22 and SIG-23
+  positive_prompts:                # what a good moment looks like
+    - a memorable moment with friends
+    - people having fun together
+    - people talking to each other
+    - an exciting event
+    - a delicious meal
+    - a beautiful view outdoors
+  negative_prompts:                # what a boring moment looks like
+    - an empty hallway
+    - a blank wall
+    - a computer screen at a desk
+    - the ground while walking
+    - a blurry dark photo
+
+selection:                   # only for the preview recap.mp4
+  mmr_lambda: 0.7            # TUNED - 1.0 = pick the highest scores, 0.0 = pick the most varied
+  n_windows: 12              # 12 x 5 s = 60 s
+  min_windows: 6             # never go below 6 windows (30 s) if the footage allows it
+  min_gap_seconds: 10        # don't pick two windows closer than this in the same video
+  min_score: 0.4             # windows scoring below this are only used to reach min_windows
+
+evaluation:
+  moment_tolerance_seconds: 2.5   # a top-10 moment counts as found if it is within this of a picked window
