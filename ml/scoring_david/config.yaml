@@ -1,0 +1,2 @@
+model_type: "yolo11n.pt"
+threshold: 0.5
