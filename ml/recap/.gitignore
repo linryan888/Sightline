@@ -1,0 +1,5 @@
+# the Supabase key stays on your computer
+.env
+# Python cache and test videos
+__pycache__/
+*.mp4
