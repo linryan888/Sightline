@@ -6,7 +6,6 @@ from supabase import create_client
 from fastapi import FastAPI, status, Depends
 from auth import make_current_user_dependency
 from windows import get_duration, make_windows, save_windows
-from pydantic import BaseModel
 from datetime import date
 from uuid import UUID, uuid4
 from pathlib import Path
@@ -25,26 +24,10 @@ supabase = create_client(
 )
 get_current_user = make_current_user_dependency(supabase)
 
-# 2. Define a Pydantic model for data validation (for POST/PUT requests)
-class Item(BaseModel):
-    name: str
-    price: float
-    description: str | None = None
-
-# 3. Create a simple GET endpoint (Root)
+# Create a simple GET endpoint (Root)
 @app.get("/")
 def read_root():
     return {"message": "Welcome to your FastAPI backend!"}
-
-# 4. Create a GET endpoint with a path parameter
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "query_parameter": q}
-
-# 5. Create a POST endpoint that accepts JSON data matching the Item model
-@app.post("/items/", status_code=status.HTTP_201_CREATED)
-def create_item(item: Item):
-    return {"message": "Item created successfully", "data": item}
 
 # --- SightLine video chunk endpoints ---
 
@@ -176,4 +159,108 @@ def get_chunks(
         raise HTTPException(
             status_code=502,
             detail="Failed to retrieve video chunks"
+        ) from e
+
+# Retrieve a single chunk and its scoring progress
+@app.get("/chunks/{chunk_id}")
+def get_chunk(
+    chunk_id: UUID,
+    user_id: str = Depends(get_current_user)
+):
+    try:
+        # Find the chunk and verify that it belongs to this user
+        result = (
+            supabase.table("chunks")
+            .select("*")
+            .eq("id", str(chunk_id))
+            .eq("user_id", user_id)
+            .execute()
+        )
+
+        if not result.data:
+            raise HTTPException(
+                status_code=404,
+                detail="Chunk not found"
+            )
+
+        chunk = result.data[0]
+
+        # Retrieve windows associated with this chunk
+        windows_result = (
+            supabase.table("windows")
+            .select("score")
+            .eq("chunk_id", str(chunk_id))
+            .execute()
+        )
+
+        windows = windows_result.data or []
+
+        total_windows = len(windows)
+
+        # A score of 0 is valid; only None means unscored
+        scored_windows = sum(
+            1 for window in windows
+            if window["score"] is not None
+        )
+
+        return {
+            "chunk": chunk,
+            "total_windows": total_windows,
+            "scored_windows": scored_windows
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Chunk Retrieval Error: {type(e).__name__}: {e}")
+        raise HTTPException(
+            status_code=502,
+            detail="Failed to retrieve chunk progress"
+        ) from e
+
+
+# Count how many of a user's chunks are in each pipeline status
+@app.get("/pipeline/status")
+def get_pipeline_status(
+    date: date,
+    user_id: str = Depends(get_current_user)
+):
+    # Every possible pipeline status
+    statuses = [
+        "uploaded",
+        "split",
+        "split_failed",
+        "scored",
+        "recap_ready"
+    ]
+
+    try:
+        # Retrieve the statuses for this user's chunks on this date
+        result = (
+            supabase.table("chunks")
+            .select("status")
+            .eq("user_id", user_id)
+            .eq("date", date.isoformat())
+            .execute()
+        )
+
+        # Start every count at zero
+        counts = {status: 0 for status in statuses}
+
+        # Count each chunk according to its status
+        for chunk in result.data:
+            chunk_status = chunk["status"]
+            if chunk_status in counts:
+                counts[chunk_status] += 1
+
+        return {
+            "date": date.isoformat(),
+            "counts": counts
+        }
+
+    except Exception as e:
+        print(f"Pipeline Status Error: {type(e).__name__}: {e}")
+        raise HTTPException(
+            status_code=502,
+            detail="Failed to retrieve pipeline status"
         ) from e

@@ -126,3 +126,53 @@ Successful response: HTTP 200 OK.
 - Invalid or expired token: HTTP 401 Unauthorized
 
 The Supabase secret API key must remain on the backend and must never be included in iOS application code.
+
+## Chunk Pipeline Statuses
+
+Each video chunk moves through the following statuses:
+
+| Status         | Meaning                                          |
+| -------------- | ------------------------------------------------ |
+| `uploaded`     | Video has been uploaded and its metadata saved   |
+| `split`        | Video has been split into windows                |
+| `split_failed` | Splitting failed; the uploaded video is retained |
+| `scored`       | All windows have received scores                 |
+| `recap_ready`  | Recap generation has completed                   |
+
+Normal progression:
+
+`uploaded` → `split` → `scored` → `recap_ready`
+
+Failure path:
+
+`uploaded` → `split_failed`
+
+The upload endpoint initially creates a chunk with status `uploaded`.
+The splitting process updates it to `split` or `split_failed`.
+
+The scoring worker should set `scored` only after all windows have scores.
+The recap pipeline should set `recap_ready` once the recap is available.
+These final two responsibilities must be coordinated with the relevant teammates.
+
+### Retrieve a chunk's scoring progress
+
+`GET /chunks/{chunk_id}`
+
+Requires a valid Supabase Bearer token.
+
+Returns the chunk record, total number of windows, and number of
+scored windows.
+
+A window counts as scored when its `score` is not null.
+A score of `0.0` counts as scored.
+
+### Retrieve daily pipeline status
+
+`GET /pipeline/status?date=YYYY-MM-DD`
+
+Requires a valid Supabase Bearer token.
+
+Returns the number of the authenticated user's chunks in each status.
+
+The backend obtains the user ID from the authentication token rather
+than accepting it as a query parameter.
