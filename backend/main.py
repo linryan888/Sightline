@@ -1,13 +1,14 @@
 import os
 import shutil
 import tempfile
+from calendar import monthrange
 from dotenv import load_dotenv
 from supabase import create_client
-from fastapi import FastAPI, status, Depends
+from fastapi import FastAPI, status, Depends, Query
 from auth import make_current_user_dependency
 from windows import get_duration, make_windows, save_windows
 from pydantic import BaseModel
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID, uuid4
 from pathlib import Path
 from fastapi import UploadFile, File, Form, HTTPException
@@ -177,3 +178,57 @@ def get_chunks(
             status_code=502,
             detail="Failed to retrieve video chunks"
         ) from e
+
+
+class Recap(BaseModel):
+    date: date
+    url: str
+    created_at: datetime
+
+
+@app.get("/recaps", response_model=Recap)
+def get_recap(date: date, user_id: str = Depends(get_current_user)):
+    try:
+        # The schema permits duplicates; use the newest recap for this day.
+        rows = (supabase.table("recaps")
+                .select("date,storage_path,created_at")
+                .eq("user_id", user_id).eq("date", date.isoformat())
+                .order("created_at", desc=True).limit(1).execute().data)
+    except Exception as e:
+        raise HTTPException(502, "Failed to retrieve recap") from e
+
+    if not rows:
+        raise HTTPException(404, f"No recap available for {date.isoformat()} yet")
+
+    row = rows[0]
+    try:
+        signed = supabase.storage.from_("recaps").create_signed_url(
+            row["storage_path"], 3600
+        )
+        url = signed.get("signedURL") or signed.get("signedUrl")
+        if not url:
+            raise ValueError("Storage returned no signed URL")
+    except Exception as e:
+        raise HTTPException(502, "Failed to create recap playback URL") from e
+
+    return {"date": row["date"], "url": url, "created_at": row["created_at"]}
+
+
+@app.get("/recaps/days", response_model=dict[str, list[date]])
+def get_recap_days(
+    month: str = Query(..., pattern=r"^[0-9]{4}-(0[1-9]|1[0-2])$"),
+    user_id: str = Depends(get_current_user)
+):
+    try:
+        first = date.fromisoformat(f"{month}-01")
+    except ValueError as e:
+        raise HTTPException(422, "month must be a valid YYYY-MM") from e
+    last = first.replace(day=monthrange(first.year, first.month)[1])
+    try:
+        rows = (supabase.table("recaps").select("date")
+                .eq("user_id", user_id)
+                .gte("date", first.isoformat()).lte("date", last.isoformat())
+                .execute().data)
+    except Exception as e:
+        raise HTTPException(502, "Failed to retrieve recap days") from e
+    return {"dates": sorted({row["date"] for row in rows})}
