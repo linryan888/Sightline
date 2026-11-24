@@ -126,3 +126,48 @@ Successful response: HTTP 200 OK.
 - Invalid or expired token: HTTP 401 Unauthorized
 
 The Supabase secret API key must remain on the backend and must never be included in iOS application code.
+
+## Recap playback and Gallery calendar
+
+Both endpoints require the same `Authorization: Bearer <access_token>` header as
+the chunk endpoints. The user ID comes from the validated token (SIG-58), so
+there is no `user_id` query parameter.
+
+- `GET /recaps?date=2026-11-23` returns
+  `{"date":"2026-11-23","url":"<signed playback URL>","created_at":"<timestamp>"}`.
+  The URL is valid for one hour. Request a fresh URL after it expires.
+  If multiple recap rows exist for a day, the newest `created_at` is used.
+  A day without a recap returns 404 with `No recap available for YYYY-MM-DD yet`.
+- `GET /recaps/days?month=2026-11` returns
+  `{"dates":["2026-11-01","2026-11-23"]}` in ascending order, without duplicates.
+  A month without recaps returns `{"dates":[]}`.
+
+Missing or invalid tokens return 401, invalid date/month parameters return 422,
+and database or signing failures return 502.
+
+### Check live playback
+
+1. Confirm the private `recaps` bucket and `recaps` table exist. Use a recap
+   already uploaded for your test user, or upload a small MP4 using
+   `python ml/recap/upload.py USER_ID YYYY-MM-DD path/to/clip.mp4`.
+   That script reads credentials privately from `ml/recap/.env`.
+2. Start the backend and open `/docs`. Click **Authorize** and enter the test
+   user's Supabase Auth access token. Keep tokens and server keys private.
+3. Execute `GET /recaps` with the recap date. Expect 200 and open the returned
+   `url` in a browser to confirm video playback.
+4. Execute `GET /recaps/days` with the corresponding month and confirm that date
+   appears. Check a day without a recap returns 404.
+
+### Run backend tests without Supabase credentials
+
+From the repository root, with Python 3.11+ and FFmpeg/ffprobe on PATH:
+
+```sh
+python -m pip install -r backend/requirements-dev.txt
+python -m pytest backend -q
+```
+
+Recap tests use a fake Supabase client for database, Storage, and token checks;
+they do not read `.env` or make network requests. Splitter tests generate a small
+video locally with FFmpeg. The default splitter window is 5 seconds; callers
+can still explicitly request a different size.

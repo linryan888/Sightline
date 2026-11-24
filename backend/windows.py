@@ -21,7 +21,7 @@ def get_duration(video_path):
     return float(data["format"]["duration"])
 
 
-def make_windows(duration, window_size=2.5):
+def make_windows(duration, window_size=5):
     """Return a list of (start, end) pairs covering the whole video.
 
     The last window is clipped so it never goes past the end of the video.

@@ -9,12 +9,12 @@ from windows import get_duration, make_windows, save_windows
 
 def test_ten_second_video():
     w = make_windows(10)
-    assert w == [(0, 2.5), (2.5, 5.0), (5.0, 7.5), (7.5, 10.0)]
+    assert w == [(0, 5), (5, 10)]
 
 
 def test_uneven_ending_is_clipped():
     w = make_windows(7)
-    assert w == [(0, 2.5), (2.5, 5.0), (5.0, 7.0)]
+    assert w == [(0, 5), (5, 7)]
     assert w[-1][1] <= 7
 
 
@@ -22,10 +22,14 @@ def test_zero_second_video():
     assert make_windows(0) == []
 
 
-def test_five_minute_video_gives_120_windows():
+def test_five_minute_video_gives_60_windows():
     w = make_windows(300)
-    assert len(w) == 120
-    assert w[-1] == (297.5, 300.0)
+    assert len(w) == 60
+    assert w[-1] == (295, 300)
+
+
+def test_custom_window_size():
+    assert make_windows(7, window_size=2.5) == [(0, 2.5), (2.5, 5), (5, 7)]
 
 
 # ---------- get_duration (needs ffmpeg installed) ----------
